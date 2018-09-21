@@ -1,0 +1,65 @@
+- hosts: all
+  gather_facts: false
+  remote_user: root
+  tasks: 
+
+    - name: Update
+      raw: apt-get -y --allow-unauthenticated update || true
+
+    - name: Ensure python is available
+      raw: test -e /usr/bin/python || apt install -y --allow-unauthenticated python-minimal
+
+    - name: Ensure python-apt is available
+      raw: test -d /usr/share/python-apt || apt install -y --allow-unauthenticated python-apt
+
+    - name: Upgrade
+      raw: apt-get -y --allow-unauthenticated upgrade
+
+- hosts: webserver
+  remote_user: root
+  tasks:
+#      - name: Install git
+#        apt:
+#            name: git-core
+#            update_cache: yes
+#
+#      - name: Get bitbucket installer
+#        get_url:
+#            url: https://downloads.atlassian.com/software/stash/downloads/atlassian-bitbucket-5.11.1-x64.bin
+#            dest: /tmp/bitbucket.bin
+#            mode: 0774
+
+
+      - name: Make webserver
+        copy:
+            dest: "/tmp/webserver.py"
+            content: |
+                #!/usr/bin/env python
+
+
+                import socket
+                import sys
+
+                HOST, PORT = '', int(sys.argv[1])
+
+                listen_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                listen_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                listen_socket.bind((HOST, PORT))
+                listen_socket.listen(1)
+                print 'Serving HTTP on port %s ...' % PORT
+                while True:
+                    client_connection, client_address = listen_socket.accept()
+                    request = client_connection.recv(1024)
+                    print request
+
+                    http_response = """\
+                HTTP/1.1 200 OK
+
+                Hello, World!
+                """
+                    client_connection.sendall(http_response)
+                    client_connection.close()
+
+      - name: Run webserver
+        shell: |
+             python /tmp/webserver.py 8080
