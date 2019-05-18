@@ -22,7 +22,7 @@
     "peer-criteria": [
         {
             "name": "HTTP-GROUP",
-            "max-price": ""
+            "max-price": "25"
         }
     ],
     "ansible-configuration": {
@@ -56,7 +56,7 @@
             "default": "webserver",
             "validation": "[a-zA-Z0-9]+"
         },
-        "domainName": {
+        "domain": {
             "description": "Enter the application domain name",
             "type": "domain",
             "default": "change.the.domain",
