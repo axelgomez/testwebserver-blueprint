@@ -1,5 +1,5 @@
 - hosts: all
-  gather_facts: false
+  gather_facts: true
   remote_user: root
   tasks: 
     - name: Update
@@ -18,11 +18,11 @@
   remote_user: root
   tasks:
     - name: Make webserver
-      get_url:
-        url: https://raw.githubusercontent.com/axelgomez/testwebserver-blueprint/master/files/webserver.py
-        dest: /tmp/webserver.py
+      copy:
+        src: /root/testwebserver-blueprint-master/files/webserver.py 
+        dest: /root/webserver.py
         mode: 0755
 
     - name: Run webserver
       shell: |
-        nohup python /tmp/webserver.py 8080 &
+        nohup python /root/webserver.py 8080 &
